@@ -1,0 +1,30 @@
+(1)
+SELECT  DAY_OF_THE_WEEK, COUNT(1) as GROUPS_OF_STUDENT
+FROM    `ingesting-data.ul_module_timetable.timetable_new`
+WHERE   week like '%2%'
+        AND week not like '%12%'        
+GROUP BY DAY_OF_THE_WEEK
+ORDER BY 2 DESC;
+
+(2)
+SELECT  MODULE_START_TIME, COUNT(1) as GROUPS_OF_STUDENT
+FROM    `ul_module_timetable.timetable`
+WHERE   week like '%2%'
+        AND week not like '%12%'
+        AND DAY_OF_THE_WEEK = 'tuesday'        
+GROUP BY MODULE_START_TIME
+ORDER BY 1;
+
+(3)
+SELECT TIME_SUB(new_end_time, INTERVAL 60 MINUTE) as START_TIME, count(1) as GROUPS_OF_STUDENT
+FROM (
+SELECT  year, course_title, MAX(MODULE_END_TIME) as new_end_time
+FROM    `ul_module_timetable.timetable_new`
+WHERE   week like '%2%'
+        AND week not like '%12%'
+        AND DAY_OF_THE_WEEK = 'tuesday'      
+        AND TIME_DIFF(MODULE_END_TIME, MODULE_START_TIME, MINUTE) = 60
+GROUP BY year, course_title
+)
+GROUP BY 1
+ORDER BY 1;
